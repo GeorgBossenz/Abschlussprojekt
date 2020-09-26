@@ -1,6 +1,18 @@
 "routines for solving a time independant 1D-Sroedinger-equation"
 import numpy as np
 
+def read_input():
+    """reads input file and produces according variables
+
+    Returns:
+        mass: mass of particle
+        xMin_xMax: touple of lower and upper boundaries
+        nPoint: number of X-values
+        interpolation: type of interpolation
+        points: matrix with set poits of curve
+    """
+    return mass, XMin_xMax, nPoint, interpolation, points
+
 
 def potential_generator(xMin_xMax, nPoint, interpolation, points):
     """generates points of potential curve
