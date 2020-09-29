@@ -1,5 +1,7 @@
 "routines for solving a time independant 1D-Sroedinger-equation"
 import numpy as np
+import scipy.interpolate as inter
+
 
 def _read_input():
     """reads input file and produces according variables
@@ -20,7 +22,8 @@ def _read_input():
     dataline_y = 0
     for dataline in alldata:
         alldata[dataline_y] = dataline.split("#")[0].strip().split()
-    #removes annotation of input data and splits lines into lists of individual inputs
+# removes annotation of input data and splits lines into lists of
+# individual inputs
         dataline_y += 1
 
     if alldata[3] == ['linear']:
@@ -33,12 +36,12 @@ def _read_input():
         #alldata[3]
         #raise some kind of input error
 
-    newdata = np.zeros((len(alldata),3))
+    newdata = np.zeros((len(alldata), 3))
     line_y = 0
     for line in alldata:
         line_x = 0
         for coll in alldata[line_y]:
-            newdata[line_y,line_x] = alldata[line_y][line_x]
+            newdata[line_y, line_x] = alldata[line_y][line_x]
             line_x += 1
         line_y += 1
 
@@ -57,30 +60,36 @@ def _potential_generator(newdata):
         delta: difference between neighboring x-values
         mass: mass of particle, extracted from input-array
     """
-    #wie komme ich jetzt auf die y-werte??
+    yy, xx = newdata.shape
+    base = newdata[5:yy+1, 0:2]
+    x_data = []
+    y_data = []
 
-    #so bekomme ich die Anzahl an inputs:
-    for number_of_inputs in range(0,len(points)):
-        for nn in range(0, nPoint):
-            if points[0,number_of_inputs] >= XX[nn]:
-                #hier muss ich mir noch überlegen wie ich YY auswähle und
-                #ob das so geschickt ist
+    pointcount = 0
+    for item in base[0]:
+        x_data.append(base[pointcount, 0])
+        y_data.append(base[pointcount, 1])
+        pointcount += 1
 
+# check if that works with floats
+    if newdata[3, 0]:
+        if newdata[3, 0] == 1:
+            Vx = np.polyfit(x_data, y_data, yy - 6)
+        else:
+            Vx = inter.CubicSpline(x_data, y_data)
+    else:
+        Vx = inter.interp1d(x_data, y_data, kind='linear')
 
+    potential = np.zeros((int(newdata[1, 2]), 2))
+    XX_values = np.linspace(int(newdata[1, 0]), int(newdata[1, 1]),
+                            int(newdata[1, 2]), endpoint=True)
+    delta = XX_values[0] - XX_values[1]
 
-
-    potential = np.zeros((2,nPoint))
-    XX = np.linspace(xMin, xMax, nPoint, endpoint=True)
-    YY = []
-    delta = abs(XX[1]-XX[0])
-    #test values for y in matrix
-    for nn in range(0, nPoint):
-        YY.append(nn)
-        #statt append hier lieber die variable an stelle nn durch den
-        #jeweiligen y-wert ersetzen
-    for index in range(0, nPoint):
-        potential[0,index] = XX[index]
-        potential[1,index] = YY[index]
+    pointcount = 0
+    for item in XX_values:
+        potential[pointcount, 0] = item
+        potential[pointcount, 1] = Vx(item)
+        pointcount += 1
 
     return potential, delta
 
