@@ -112,18 +112,17 @@ def _hamiltonmatrix_generator(potential, delta, mass):
         V_diskr.append(pair[1])
 
     content = []
-
     aa = 1 / (mass * (delta**2))
 
     content.append(aa * V_diskr[0])
-    for columns in range(0, len(V_diskr)-2):
+    for columns in range(0, len(V_diskr)-1):
         content.append(-0.5 * aa)
-        for num in range(0, len(V_diskr)-3):
+        for num in range(0, len(V_diskr)-2):
             content.append(0)
         content.append(-0.5 * aa)
-        content.append(aa * V_diskr[columns])
+        content.append(aa * V_diskr[columns+1])
     hamiltonian = np.array(content)
-    hamiltonian.shape = (len(V_diskr)-1, len(V_diskr)-1)
+    hamiltonian.shape = (len(V_diskr), len(V_diskr))
 
     return hamiltonian
 
