@@ -1,32 +1,61 @@
 "routines for solving a time independant 1D-Sroedinger-equation"
 import numpy as np
 
-def read_input():
+def _read_input():
     """reads input file and produces according variables
 
     Returns:
-        mass: mass of particle
-        xMin_xMax: touple of lower and upper boundaries
-        nPoint: number of X-values
-        interpolation: type of interpolation
-        points: matrix with set poits of curve
+        newdata: an array containing the following variables as rows:
+            -mass: mass of particle
+            -xMin_xMax: touple of lower and upper boundaries
+            -nPoint: number of X-values
+            -interpolation: type of interpolation as number form 0 to 2
+            -number of given Points for interpolation
+            -points: matrix with set poits of curve
     """
-    return mass, XMin_xMax, nPoint, interpolation, points
+    alldata = []
+    with open("input/5.1Potentialtopf") as fp:
+        for line in fp:
+            alldata.append(line.strip())
+    dataline_y = 0
+    for dataline in alldata:
+        alldata[dataline_y] = dataline.split("#")[0].strip().split()
+    #removes annotation of input data and splits lines into lists of individual inputs
+        dataline_y += 1
+
+    if alldata[3] == ['linear']:
+        alldata[3] = [0]
+    elif alldata[3] == ['polynomial']:
+        alldata[3] = [1]
+    elif alldata[3] == ['cspline']:
+        alldata[3] = [2]
+    #else:
+        #alldata[3]
+        #raise some kind of input error
+
+    newdata = np.zeros((len(alldata),3))
+    line_y = 0
+    for line in alldata:
+        line_x = 0
+        for coll in alldata[line_y]:
+            newdata[line_y,line_x] = alldata[line_y][line_x]
+            line_x += 1
+        line_y += 1
+
+    return newdata
 
 
-def potential_generator(xMin_xMax, nPoint, interpolation, points):
+def _potential_generator(newdata):
     """generates points of potential curve
 
     Args:
-        xMin_xMax: touple of lower and upper boundaries
-        nPoint: number of X-values
-        interpolation: type of interpolation
-        points: matrix with set points of curve
+        newdata: an array containing the user-input
 
     Returns:
         potential: Matrix with corresponding x and V(x) values
         of potential curve
         delta: difference between neighboring x-values
+        mass: mass of particle, extracted from input-array
     """
     #wie komme ich jetzt auf die y-werte??
 
@@ -56,7 +85,7 @@ def potential_generator(xMin_xMax, nPoint, interpolation, points):
     return potential, delta
 
 
-def hamiltonmatrix_generator(potential, delta, mass):
+def _hamiltonmatrix_generator(potential, delta, mass):
     """generates the hamilton matrix
 
     Args:
