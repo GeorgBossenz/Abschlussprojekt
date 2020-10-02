@@ -4,7 +4,7 @@ import scipy.interpolate as inter
 import os.path
 
 
-def main(filename):
+def main(filename=''):
     """solver for Schroedinger-equation
 
     Args:
@@ -15,10 +15,12 @@ def main(filename):
         filename = input("please insert name of input file: ")
 # falls hier nix eingegeben wurde muss das programm trotzdem irgendwas bekommen
 
-    _read_input(filename)
-    _potential_generator(newdata)
-    _hamiltonmatrix_generator(potential, delta, mass)
-
+    newdata = _read_input(filename)
+    potential, delta, mass = _potential_generator(newdata)
+    hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
+    print('masse: ', mass)
+    print('potential: ', potential[0,1])
+    print(hamiltonian[0,0])
 
 def _read_input(filename):
     """reads input file and produces according variables
@@ -39,8 +41,8 @@ def _read_input(filename):
     alldata = []
 
     directory = "input"
-    file-location = os.path.join(directory, filename)
-    with open(file-location) as fp:
+    file_location = os.path.join(directory, filename)
+    with open(file_location) as fp:
         for line in fp:
             alldata.append(line.strip())
     dataline_y = 0
@@ -52,7 +54,7 @@ def _read_input(filename):
 
     if alldata[3] == ['linear']:
         alldata[3] = [0]
-    elif alldata[3] == ['polynomial']:
+    elif alldata[3] == ['polinomial']:
         alldata[3] = [1]
     elif alldata[3] == ['cspline']:
         alldata[3] = [2]
@@ -175,9 +177,9 @@ def _expvalues_calculator(unknown):
     return sigma, uncertainty
 #output should be file not variable
 
-def _data_saver(eigenvalues, eigenvectors):
+#def _data_saver(eigenvalues, eigenvectors):
 
 
 
 if __name__ == '__main__':
-    main():
+    main()
