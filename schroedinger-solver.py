@@ -2,7 +2,10 @@
 import numpy as np
 import scipy.interpolate as inter
 import os.path
-
+import numpy.linalg as linalg
+# from scipy.linalg import eigh_tridiagonal
+# import eigh_tridiagonal
+_TOLERANCE = 0.000001
 
 def main(filename=''):
     """solver for Schroedinger-equation
@@ -18,12 +21,16 @@ def main(filename=''):
     newdata = _read_input(filename)
     potential, delta, mass = _potential_generator(newdata)
     hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
-    eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian)
+#    eigenvalues, eigenvectors = _hamiltonmatrix_solver(potential, mass, delta,
+# newdata)
+    eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian, newdata)
 
 # placeholder for actual wavefunctions variable generation
+
+
     wavefunctions = np.array([x, y1, y2]).transpose()
-    with pf.open("wavefunctions.dat", "w"):
-    fp.write(str(wavefunctions))
+    with fp.open("wavefunctions.dat", "w"):
+        fp.write(str(wavefunctions))
 
 def _read_input(filename):
     """reads input file and produces according variables
@@ -95,7 +102,7 @@ def _potential_generator(newdata):
     y_data = []
 
     pointcount = 0
-    for item in base[0]:
+    for item in base:
         x_data.append(base[pointcount, 0])
         y_data.append(base[pointcount, 1])
         pointcount += 1
@@ -112,7 +119,7 @@ def _potential_generator(newdata):
     potential = np.zeros((int(newdata[1, 2]), 2))
     XX_values = np.linspace(int(newdata[1, 0]), int(newdata[1, 1]),
                             int(newdata[1, 2]), endpoint=True)
-    delta = XX_values[0] - XX_values[1]
+    delta = XX_values[1] - XX_values[0]
 
     pointcount = 0
     for item in XX_values:
@@ -156,7 +163,8 @@ def _hamiltonmatrix_generator(potential, delta, mass):
     return hamiltonian
 
 
-def _hamiltonmatrix_solver(hamiltonian):
+def _hamiltonmatrix_solver(hamiltonian, newdata):
+# def _hamiltonmatrix_solver(potential, mass, delta, newdata):
     """procedure to produce eigenvalues and corresponding eigenvectors
     of hamilton matrix
 
@@ -167,7 +175,18 @@ def _hamiltonmatrix_solver(hamiltonian):
         eigenvalues: list of aquired eigevalues
         eingenvectors: list of eigenvectors
     """
+#    from scipy.sparse.linalg import eigsh
+#    eigenvalues, eigenvectors = eigsh(hamiltonian, newdata[2, 1], which='SM')
+
+    eigenvalues, eigenvectors = linalg.eig(hamiltonian)
+
+#    aa = 1 / (mass * (delta**2))
+#    eigenvalues, eigenvectors = eigh_tridiagonal(aa * potential[:, 1],
+#                              np.ones(len(potential)-1) * -0.5 * aa, select='i',
+#                              select_range=(newdata[2, 0], newdata[2, 1]), tol=_TOLERANCE)
+
     return eigenvalues, eigenvectors
+
 
 def _expvalues_calculator(unknown):
     """will calculate sigma and uncertainty
@@ -178,10 +197,9 @@ def _expvalues_calculator(unknown):
 
     """
     return sigma, uncertainty
-#output should be file not variable
+# output should be file not variable
 
-#def _data_saver(eigenvalues, eigenvectors):
-
+# def _data_saver(eigenvalues, eigenvectors):
 
 
 if __name__ == '__main__':
