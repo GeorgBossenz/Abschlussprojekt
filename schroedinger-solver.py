@@ -18,9 +18,12 @@ def main(filename=''):
     newdata = _read_input(filename)
     potential, delta, mass = _potential_generator(newdata)
     hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
-    print('masse: ', mass)
-    print('potential: ', potential[0,1])
-    print(hamiltonian[0,0])
+    eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian)
+
+# placeholder for actual wavefunctions variable generation
+    wavefunctions = np.array([x, y1, y2]).transpose()
+    with pf.open("wavefunctions.dat", "w"):
+    fp.write(str(wavefunctions))
 
 def _read_input(filename):
     """reads input file and produces according variables
