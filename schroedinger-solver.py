@@ -1,10 +1,30 @@
-"routines for solving a time independant 1D-Sroedinger-equation"
+"routines for solving a time independant 1D-Schroedinger-equation"
 import numpy as np
 import scipy.interpolate as inter
 
 
-def _read_input():
+def main(filename):
+    """solver for Schroedinger-equation
+
+    Args:
+        filename:
+            name of inputfile in subdirectory 'input'
+    """
+    if not filename:
+        input():
+# falls hier nix eingegeben wurde muss das programm trotzdem irgendwas bekommen
+
+    _read_input(filename)
+    _potential_generator(newdata)
+    _hamiltonmatrix_generator(potential, delta, mass)
+
+
+def _read_input(filename):
     """reads input file and produces according variables
+
+    Args:
+        filename:
+            name of inputfile in subdirectory 'input'
 
     Returns:
         newdata: an array containing the following variables as rows:
@@ -127,7 +147,7 @@ def _hamiltonmatrix_generator(potential, delta, mass):
     return hamiltonian
 
 
-def hamiltonmatrix_solver(hamiltonian):
+def _hamiltonmatrix_solver(hamiltonian):
     """procedure to produce eigenvalues and corresponding eigenvectors
     of hamilton matrix
 
@@ -140,7 +160,7 @@ def hamiltonmatrix_solver(hamiltonian):
     """
     return eigenvalues, eigenvectors
 
-def expvalues_calculator(unknown):
+def _expvalues_calculator(unknown):
     """will calculate sigma and uncertainty
 
     Args:
@@ -150,3 +170,10 @@ def expvalues_calculator(unknown):
     """
     return sigma, uncertainty
 #output should be file not variable
+
+def _data_saver(eigenvalues, eigenvectors):
+
+
+
+if __name__ == '__main__':
+    main():
