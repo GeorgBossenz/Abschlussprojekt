@@ -1,6 +1,7 @@
 "routines for solving a time independant 1D-Schroedinger-equation"
 import numpy as np
 import scipy.interpolate as inter
+import os.path
 
 
 def main(filename):
@@ -10,8 +11,8 @@ def main(filename):
         filename:
             name of inputfile in subdirectory 'input'
     """
-    if not filename:
-        input():
+    while not filename:
+        filename = input("please insert name of input file: ")
 # falls hier nix eingegeben wurde muss das programm trotzdem irgendwas bekommen
 
     _read_input(filename)
@@ -36,7 +37,10 @@ def _read_input(filename):
             -points: matrix with set poits of curve
     """
     alldata = []
-    with open("input/5.1Potentialtopf") as fp:
+
+    directory = "input"
+    file-location = os.path.join(directory, filename)
+    with open(file-location) as fp:
         for line in fp:
             alldata.append(line.strip())
     dataline_y = 0
