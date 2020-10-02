@@ -32,18 +32,24 @@ def main(filename=''):
 
     eigenvalues.sort()
     energs = np.transpose(eigenvalues[int(newdata[2, 0])-1:int(newdata[2, 1])])
-    with open("energies.dat", "w") as fp:
+
+    np.savetxt("energies.dat",energs)
+
+#    with open("energies.dat", "w") as fp:
         # ein ew pro zeile
-        fp.write(str(energs))
+#        fp.write(str(energs))
 
     wanted_waves = sortedvectors[:, int(newdata[2, 0])-1:int(newdata[2, 1])]
     wavefuncs_x = potential[:, 0]
     wavefuncs_x.shape = (len(potential), 1)
     wavefuncts = np.concatenate((wavefuncs_x, wanted_waves), axis=1)
-    with open("wavefunctions.dat", "w") as fp:
-        print(newdata[2, 0], newdata[2, 1])
-        print(wavefuncts[0:2000:50, :])
-        fp.write(str(wavefuncts))
+
+    np.savetxt("wavefunctions.dat", wavefuncts)
+
+#    with open("wavefunctions.dat", "w") as fp:
+#        print(newdata[2, 0], newdata[2, 1])
+    print(wavefuncts[0:2000:50, :])
+#        fp.write(str(wavefuncts))
 
 def _read_input(filename):
     """reads input file and produces according variables
