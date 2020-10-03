@@ -8,17 +8,15 @@ import numpy.linalg as linalg
 _TOLERANCE = 0.000001
 
 
-def main(filename=''):
+def main(directory=''):
     """solver for Schroedinger-equation
 
     Args:
-        filename:
-            name of inputfile in subdirectory 'input'
+        directory:
+            directory of input file other than subdirectory 'input'
     """
-    while not filename:
-        filename = input("please insert name of input file: ")
-# falls hier nix eingegeben wurde muss das programm trotzdem irgendwas bekommen
 
+    filename = os.path.join(directory, "schrodinger.inp")
     newdata = _read_input(filename)
     potential, delta, mass = _potential_generator(newdata)
     hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
