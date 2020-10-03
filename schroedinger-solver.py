@@ -51,7 +51,7 @@ def main(filename=''):
     wavefuncts = np.concatenate((wavefuncs_x, wanted_waves), axis=1)
 
     np.savetxt("wavefunctions.dat", wavefuncts)
-
+    np.savetxt("potential.dat",potential)
 
 
 #    with open("wavefunctions.dat", "w") as fp:
@@ -135,24 +135,36 @@ def _potential_generator(newdata):
         pointcount += 1
 
 # check if that works with floats
+    Vx = False
     if newdata[3, 0]:
         if newdata[3, 0] == 1:
-            Vx = np.polyfit(x_data, y_data, yy - 6)
+            coeffs = np.polyfit(x_data, y_data, yy - 6)
         else:
             Vx = inter.CubicSpline(x_data, y_data)
     else:
         Vx = inter.interp1d(x_data, y_data, kind='linear')
 
+    npoints = int(newdata[1, 2])
     potential = np.zeros((int(newdata[1, 2]), 2))
     XX_values = np.linspace(int(newdata[1, 0]), int(newdata[1, 1]),
-                            int(newdata[1, 2]), endpoint=True)
+                            npoints, endpoint=True)
     delta = XX_values[1] - XX_values[0]
 
-    pointcount = 0
-    for item in XX_values:
-        potential[pointcount, 0] = item
-        potential[pointcount, 1] = Vx(item)
-        pointcount += 1
+    if not Vx:
+        YY_values = np.zeros(npoints)
+        for pointcount in range(npoints):
+            for power in range(yy - 5):
+                YY_values[pointcount] += coeffs[power] * (XX_values[pointcount]
+                    ** (yy - 6 - power))
+
+        potential[:, 0] = XX_values
+        potential[:, 1] = YY_values
+    else:
+        pointcount = 0
+        for item in XX_values:
+            potential[pointcount, 0] = item
+            potential[pointcount, 1] = Vx(item)
+            pointcount += 1
 
     mass = newdata[0, 0]
     return potential, delta, mass
