@@ -32,6 +32,7 @@ def main(filename=''):
 #    np.transpose(sortedvectors)
     normfactors = []
     for ii in range(0, len(sortedvectors[0, :])):
+# np.sum hat hier nicht funktionieren wollen
         aa = sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta)
         aa = aa ** -0.5
         normfactors.append(aa)
@@ -40,19 +41,27 @@ def main(filename=''):
     eigenvalues.sort()
     energs = np.transpose(eigenvalues[int(newdata[2, 0])-1:int(newdata[2, 1])])
 
-    np.savetxt("energies.dat", energs)
-
     wanted_waves = sortedvectors[:, int(newdata[2, 0])-1:int(newdata[2, 1])]
     wavefuncs_x = potential[:, 0]
     wavefuncs_x.shape = (len(potential), 1)
     wavefuncts = np.concatenate((wavefuncs_x, wanted_waves), axis=1)
 
+    expected_x, sigma = _expvalues_calculator(wanted_waves, delta, potential)
+
+    xyz, nvalues = np.shape(wanted_waves)
+    print(nvalues)
+    print(expected_x)
+    expvalues = np.zeros((nvalues, 2))
+    expvalues[:, 0] = expected_x
+    expvalues[:, 1] = sigma
+
+    np.savetxt("expvalues.dat", expvalues)
+    np.savetxt("energies.dat", energs)
     np.savetxt("wavefunctions.dat", wavefuncts)
     np.savetxt("potential.dat", potential)
 
-    print(wavefuncts[0:2000:50, :])
-    for ii in range(0, len(sortedvectors[0, :])):
-        print(sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta))
+    print(wavefuncts[0:2000:200, :])
+
 
 def _read_input(filename):
     """reads input file and produces according variables
@@ -222,17 +231,25 @@ def _hamiltonmatrix_solver(hamiltonian, newdata):
     return eigenvalues, eigenvectors
 
 
-def _expvalues_calculator(unknown):
+def _expvalues_calculator(wanted_waves, delta, potential):
     """will calculate sigma and uncertainty
 
     Args:
+        wanted_waves: array of discrete amplitudes of wavefunction
+        delta:difference between neighboring x-values
+        potential: Matrix with corresponding x and V(x) values
+        of potential curve
 
     Returns:
-
+        mean_x: 1D array of expected amplitudes
+        sigma: 1D array of mean quadratic deviation from expected amplitude
     """
-    sigma = 0
-    uncertainty = 0
-    return sigma, uncertainty
+    potential_x = potential[:, 0]
+    wavesquared = wanted_waves * wanted_waves * potential_x[:, np.newaxis]
+    expected_x = np.sum(wavesquared, axis=0) * delta
+    mean_x = np.sum(wavesquared * potential_x[:, np.newaxis], axis=0) * delta
+    sigma = (mean_x - (expected_x ** 2)) ** 0.5
+    return expected_x, sigma
 # output should be file not variable
 
 # def _data_saver(eigenvalues, eigenvectors):
