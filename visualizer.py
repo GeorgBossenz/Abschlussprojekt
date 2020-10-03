@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 def data_visualizer():
     "reads and plots data from input"
 
-    %matplotlib inline
-
     plt.subplot(1, 2, 1)
 
     potential = np.loadtxt("potential.dat")
@@ -19,7 +17,7 @@ def data_visualizer():
     cc = np.loadtxt("expvalues.dat")
 
     plotnr = 0
-    for wert in bb:  #dort packen wir eine Liste mit den Eigenwerten hin
+    for wert in bb:
         eigenwert = []
         for xwert in potential:
             eigenwert.append(wert)
@@ -34,7 +32,6 @@ def data_visualizer():
         plotnr += 1
     plt.plot(xx, y1, color="black", label="potential curve", scaley=False)
 
-
     plt.xlabel("x [Bohr]")
     plt.ylabel("Energy [Hartree]")
     plt.title("Potential, eigenstates, <x>")
@@ -47,8 +44,13 @@ def data_visualizer():
         for xwert in potential:
             eigenwert.append(wert)
         plt.plot(xx, eigenwert, color="grey")
-        plt.plot(cc[plotnr, 1], wert, marker="+", color="violet", markersize = 12, mew=2)
+        plt.plot(cc[plotnr, 1], wert, marker="+", color="violet",
+                 markersize=12, mew=2)
         plotnr += 1
 
     plt.xlabel("[Bohr]")
     plt.title("sigma x")
+
+
+if __name__ == '__main__':
+    data_visualizer()

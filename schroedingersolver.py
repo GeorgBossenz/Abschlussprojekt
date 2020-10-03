@@ -22,7 +22,7 @@ def main(directory=''):
     hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
 #    eigenvalues, eigenvectors = _hamiltonmatrix_solver(potential, mass, delta,
 # newdata)
-    eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian, newdata)
+    eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian)
 
 #    np.transpose(eigenvectors)
     sortedvectors = eigenvectors[:, eigenvalues.argsort()]
@@ -47,8 +47,6 @@ def main(directory=''):
     expected_x, sigma = _expvalues_calculator(wanted_waves, delta, potential)
 
     xyz, nvalues = np.shape(wanted_waves)
-    print(nvalues)
-    print(expected_x)
     expvalues = np.zeros((nvalues, 2))
     expvalues[:, 0] = expected_x
     expvalues[:, 1] = sigma
@@ -97,8 +95,6 @@ def _read_input(filename):
         alldata[3] = [1]
     elif alldata[3] == ['cspline']:
         alldata[3] = [2]
-    #else:
-        #raise some kind of input error
 
     newdata = np.zeros((len(alldata), 3))
     line_y = 0
@@ -136,14 +132,14 @@ def _potential_generator(newdata):
         pointcount += 1
 
 # check if that works with floats
-    Vx = False
+    V_x = False
     if newdata[3, 0]:
         if newdata[3, 0] == 1:
             coeffs = np.polyfit(x_data, y_data, yy - 6)
         else:
-            Vx = inter.CubicSpline(x_data, y_data)
+            V_x = inter.CubicSpline(x_data, y_data)
     else:
-        Vx = inter.interp1d(x_data, y_data, kind='linear')
+        V_x = inter.interp1d(x_data, y_data, kind='linear')
 
     npoints = int(newdata[1, 2])
     potential = np.zeros((int(newdata[1, 2]), 2))
@@ -151,7 +147,7 @@ def _potential_generator(newdata):
                             npoints, endpoint=True)
     delta = XX_values[1] - XX_values[0]
 
-    if not Vx:
+    if not V_x:
         YY_values = np.zeros(npoints)
         for pointcount in range(npoints):
             for power in range(yy - 5):
@@ -164,7 +160,7 @@ def _potential_generator(newdata):
         pointcount = 0
         for item in XX_values:
             potential[pointcount, 0] = item
-            potential[pointcount, 1] = Vx(item)
+            potential[pointcount, 1] = V_x(item)
             pointcount += 1
 
     mass = newdata[0, 0]
@@ -203,7 +199,7 @@ def _hamiltonmatrix_generator(potential, delta, mass):
     return hamiltonian
 
 
-def _hamiltonmatrix_solver(hamiltonian, newdata):
+def _hamiltonmatrix_solver(hamiltonian):
     # def _hamiltonmatrix_solver(potential, mass, delta, newdata):
     """procedure to produce eigenvalues and corresponding eigenvectors
     of hamilton matrix
