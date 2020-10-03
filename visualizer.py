@@ -3,8 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def data_visualizer():
-    "reads and plots data from input"
+def data_visualizer(scale=1):
+    """reads and plots data from input
+
+    Args:
+        scale: scales the wavefunctions, default = no scaling
+    """
 
     plt.subplot(1, 2, 1)
 
@@ -27,7 +31,7 @@ def data_visualizer():
             color = "red"
         else:
             color = "blue"
-        plt.plot(xx, aa[:, plotnr + 1] + wert, color=color)
+        plt.plot(xx, aa[:, plotnr + 1] * scale + wert, color=color)
         plt.plot(cc[plotnr, 0], wert, marker="x", color="green", mew=2)
         plotnr += 1
     plt.plot(xx, y1, color="black", label="potential curve", scaley=False)
@@ -51,6 +55,7 @@ def data_visualizer():
     plt.xlabel("[Bohr]")
     plt.title("sigma x")
     plt.savefig('curves.pdf', format='pdf')
+
 
 if __name__ == '__main__':
     data_visualizer()
