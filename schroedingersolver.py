@@ -1,4 +1,4 @@
-"routines for solving a time independant 1D-Schroedinger-equation"
+"""routines for solving a time independant 1D-Schroedinger-equation"""
 import numpy as np
 import scipy.interpolate as inter
 import os.path
@@ -8,23 +8,21 @@ import numpy.linalg as linalg
 _TOLERANCE = 0.000001
 
 
-def main(filename=''):
+def main(directory=''):
     """solver for Schroedinger-equation
 
     Args:
-        filename:
-            name of inputfile in subdirectory 'input'
+        directory:
+            directory of input file other than subdirectory 'input'
     """
-    while not filename:
-        filename = input("please insert name of input file: ")
-# falls hier nix eingegeben wurde muss das programm trotzdem irgendwas bekommen
 
+    filename = os.path.join(directory, "schrodinger.inp")
     newdata = _read_input(filename)
     potential, delta, mass = _potential_generator(newdata)
     hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
 #    eigenvalues, eigenvectors = _hamiltonmatrix_solver(potential, mass, delta,
 # newdata)
-    eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian, newdata)
+    eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian)
 
 #    np.transpose(eigenvectors)
     sortedvectors = eigenvectors[:, eigenvalues.argsort()]
@@ -32,6 +30,7 @@ def main(filename=''):
 #    np.transpose(sortedvectors)
     normfactors = []
     for ii in range(0, len(sortedvectors[0, :])):
+        # np.sum hat hier nicht funktionieren wollen
         aa = sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta)
         aa = aa ** -0.5
         normfactors.append(aa)
@@ -40,19 +39,25 @@ def main(filename=''):
     eigenvalues.sort()
     energs = np.transpose(eigenvalues[int(newdata[2, 0])-1:int(newdata[2, 1])])
 
-    np.savetxt("energies.dat", energs)
-
     wanted_waves = sortedvectors[:, int(newdata[2, 0])-1:int(newdata[2, 1])]
     wavefuncs_x = potential[:, 0]
     wavefuncs_x.shape = (len(potential), 1)
     wavefuncts = np.concatenate((wavefuncs_x, wanted_waves), axis=1)
 
+    expected_x, sigma = _expvalues_calculator(wanted_waves, delta, potential)
+
+    xyz, nvalues = np.shape(wanted_waves)
+    expvalues = np.zeros((nvalues, 2))
+    expvalues[:, 0] = expected_x
+    expvalues[:, 1] = sigma
+
+    np.savetxt("expvalues.dat", expvalues)
+    np.savetxt("energies.dat", energs)
     np.savetxt("wavefunctions.dat", wavefuncts)
     np.savetxt("potential.dat", potential)
 
-    print(wavefuncts[0:2000:50, :])
-    for ii in range(0, len(sortedvectors[0, :])):
-        print(sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta))
+    print(wavefuncts[0:2000:200, :])
+
 
 def _read_input(filename):
     """reads input file and produces according variables
@@ -90,9 +95,6 @@ def _read_input(filename):
         alldata[3] = [1]
     elif alldata[3] == ['cspline']:
         alldata[3] = [2]
-    #else:
-        #alldata[3]
-        #raise some kind of input error
 
     newdata = np.zeros((len(alldata), 3))
     line_y = 0
@@ -130,14 +132,14 @@ def _potential_generator(newdata):
         pointcount += 1
 
 # check if that works with floats
-    Vx = False
+    V_x = False
     if newdata[3, 0]:
         if newdata[3, 0] == 1:
             coeffs = np.polyfit(x_data, y_data, yy - 6)
         else:
-            Vx = inter.CubicSpline(x_data, y_data)
+            V_x = inter.CubicSpline(x_data, y_data)
     else:
-        Vx = inter.interp1d(x_data, y_data, kind='linear')
+        V_x = inter.interp1d(x_data, y_data, kind='linear')
 
     npoints = int(newdata[1, 2])
     potential = np.zeros((int(newdata[1, 2]), 2))
@@ -145,7 +147,7 @@ def _potential_generator(newdata):
                             npoints, endpoint=True)
     delta = XX_values[1] - XX_values[0]
 
-    if not Vx:
+    if not V_x:
         YY_values = np.zeros(npoints)
         for pointcount in range(npoints):
             for power in range(yy - 5):
@@ -158,7 +160,7 @@ def _potential_generator(newdata):
         pointcount = 0
         for item in XX_values:
             potential[pointcount, 0] = item
-            potential[pointcount, 1] = Vx(item)
+            potential[pointcount, 1] = V_x(item)
             pointcount += 1
 
     mass = newdata[0, 0]
@@ -197,7 +199,7 @@ def _hamiltonmatrix_generator(potential, delta, mass):
     return hamiltonian
 
 
-def _hamiltonmatrix_solver(hamiltonian, newdata):
+def _hamiltonmatrix_solver(hamiltonian):
     # def _hamiltonmatrix_solver(potential, mass, delta, newdata):
     """procedure to produce eigenvalues and corresponding eigenvectors
     of hamilton matrix
@@ -222,17 +224,25 @@ def _hamiltonmatrix_solver(hamiltonian, newdata):
     return eigenvalues, eigenvectors
 
 
-def _expvalues_calculator(unknown):
+def _expvalues_calculator(wanted_waves, delta, potential):
     """will calculate sigma and uncertainty
 
     Args:
+        wanted_waves: array of discrete amplitudes of wavefunction
+        delta:difference between neighboring x-values
+        potential: Matrix with corresponding x and V(x) values
+        of potential curve
 
     Returns:
-
+        mean_x: 1D array of expected amplitudes
+        sigma: 1D array of mean quadratic deviation from expected amplitude
     """
-    sigma = 0
-    uncertainty = 0
-    return sigma, uncertainty
+    potential_x = potential[:, 0]
+    wavesquared = wanted_waves * wanted_waves * potential_x[:, np.newaxis]
+    expected_x = np.sum(wavesquared, axis=0) * delta
+    mean_x = np.sum(wavesquared * potential_x[:, np.newaxis], axis=0) * delta
+    sigma = (mean_x - (expected_x ** 2)) ** 0.5
+    return expected_x, sigma
 # output should be file not variable
 
 # def _data_saver(eigenvalues, eigenvectors):
