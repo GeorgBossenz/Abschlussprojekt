@@ -7,18 +7,48 @@ def data_visualizer():
     "reads and plots data from input"
 
     %matplotlib inline
-    potential = 1 #the right inputs, variable types n stuff missing
-    xMin_xMax = -10, 10,
-    nPoint = 100
-    potential = np.matrix(1,2)
 
-#ist erstmal nur zum ausprobieren, x-achse wird später durch
-#die erste spalte vom potentail ersetzt
+    plt.subplot(1, 2, 1)
 
-    xMin, xMax = xMin_xMax
+    potential = np.loadtxt("potential.dat")
+    xx = potential[:, 0]
+    y1 = potential[:, 1]
 
-    xx = np.linspace(xMin, xMax, nPoint, endpoint=True)
-    y1 = (2,) * len(xx)
+    aa = np.loadtxt("wavefunctions.dat")
+    bb = np.loadtxt("energies.dat")
+    cc = np.loadtxt("expvalues.dat")
 
-    plt.plot(xx, y1, color='green', linewidth=2.0, linestyle="-", label='2')
+    plotnr = 0
+    for wert in bb:  #dort packen wir eine Liste mit den Eigenwerten hin
+        eigenwert = []
+        for xwert in potential:
+            eigenwert.append(wert)
+        plt.plot(xx, eigenwert, color="grey")
 
+        if plotnr % 2:
+            color = "red"
+        else:
+            color = "blue"
+        plt.plot(xx, aa[:, plotnr + 1] + wert, color=color)
+        plt.plot(cc[plotnr, 0], wert, marker="x", color="green", mew=2)
+        plotnr += 1
+    plt.plot(xx, y1, color="black", label="potential curve", scaley=False)
+
+
+    plt.xlabel("x [Bohr]")
+    plt.ylabel("Energy [Hartree]")
+    plt.title("Potential, eigenstates, <x>")
+
+    plt.subplot(1, 2, 2)
+
+    plotnr = 0
+    for wert in bb:
+        eigenwert = []
+        for xwert in potential:
+            eigenwert.append(wert)
+        plt.plot(xx, eigenwert, color="grey")
+        plt.plot(cc[plotnr, 1], wert, marker="+", color="violet", markersize = 12, mew=2)
+        plotnr += 1
+
+    plt.xlabel("[Bohr]")
+    plt.title("sigma x")

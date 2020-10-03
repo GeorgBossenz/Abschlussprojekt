@@ -1,4 +1,4 @@
-"routines for solving a time independant 1D-Schroedinger-equation"
+"""routines for solving a time independant 1D-Schroedinger-equation"""
 import numpy as np
 import scipy.interpolate as inter
 import os.path
@@ -32,7 +32,7 @@ def main(filename=''):
 #    np.transpose(sortedvectors)
     normfactors = []
     for ii in range(0, len(sortedvectors[0, :])):
-# np.sum hat hier nicht funktionieren wollen
+        # np.sum hat hier nicht funktionieren wollen
         aa = sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta)
         aa = aa ** -0.5
         normfactors.append(aa)
@@ -100,7 +100,6 @@ def _read_input(filename):
     elif alldata[3] == ['cspline']:
         alldata[3] = [2]
     #else:
-        #alldata[3]
         #raise some kind of input error
 
     newdata = np.zeros((len(alldata), 3))
