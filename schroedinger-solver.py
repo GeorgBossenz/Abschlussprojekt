@@ -7,6 +7,7 @@ import numpy.linalg as linalg
 # import eigh_tridiagonal
 _TOLERANCE = 0.000001
 
+
 def main(filename=''):
     """solver for Schroedinger-equation
 
@@ -30,7 +31,7 @@ def main(filename=''):
 #    sortedvectors = eigenvectors[eigenvalues.argsort()]
 #    np.transpose(sortedvectors)
     normfactors = []
-    for ii in range (0, len(sortedvectors[0,:])):
+    for ii in range(0, len(sortedvectors[0, :])):
         aa = sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta)
         aa = aa ** -0.5
         normfactors.append(aa)
@@ -39,11 +40,7 @@ def main(filename=''):
     eigenvalues.sort()
     energs = np.transpose(eigenvalues[int(newdata[2, 0])-1:int(newdata[2, 1])])
 
-    np.savetxt("energies.dat",energs)
-
-#    with open("energies.dat", "w") as fp:
-        # ein ew pro zeile
-#        fp.write(str(energs))
+    np.savetxt("energies.dat", energs)
 
     wanted_waves = sortedvectors[:, int(newdata[2, 0])-1:int(newdata[2, 1])]
     wavefuncs_x = potential[:, 0]
@@ -51,13 +48,11 @@ def main(filename=''):
     wavefuncts = np.concatenate((wavefuncs_x, wanted_waves), axis=1)
 
     np.savetxt("wavefunctions.dat", wavefuncts)
-    np.savetxt("potential.dat",potential)
+    np.savetxt("potential.dat", potential)
 
-
-#    with open("wavefunctions.dat", "w") as fp:
-#        print(newdata[2, 0], newdata[2, 1])
     print(wavefuncts[0:2000:50, :])
-#        fp.write(str(wavefuncts))
+    for ii in range(0, len(sortedvectors[0, :])):
+        print(sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta))
 
 def _read_input(filename):
     """reads input file and produces according variables
@@ -203,7 +198,7 @@ def _hamiltonmatrix_generator(potential, delta, mass):
 
 
 def _hamiltonmatrix_solver(hamiltonian, newdata):
-# def _hamiltonmatrix_solver(potential, mass, delta, newdata):
+    # def _hamiltonmatrix_solver(potential, mass, delta, newdata):
     """procedure to produce eigenvalues and corresponding eigenvectors
     of hamilton matrix
 
@@ -221,8 +216,8 @@ def _hamiltonmatrix_solver(hamiltonian, newdata):
 
 #    aa = 1 / (mass * (delta**2))
 #    eigenvalues, eigenvectors = eigh_tridiagonal(aa * potential[:, 1],
-#                              np.ones(len(potential)-1) * -0.5 * aa, select='i',
-#                              select_range=(newdata[2, 0], newdata[2, 1]), tol=_TOLERANCE)
+#          np.ones(len(potential)-1) * -0.5 * aa, select='i',
+#          select_range=(newdata[2, 0], newdata[2, 1]), tol=_TOLERANCE)
 
     return eigenvalues, eigenvectors
 
@@ -235,6 +230,8 @@ def _expvalues_calculator(unknown):
     Returns:
 
     """
+    sigma = 0
+    uncertainty = 0
     return sigma, uncertainty
 # output should be file not variable
 
