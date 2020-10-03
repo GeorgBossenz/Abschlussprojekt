@@ -29,6 +29,12 @@ def main(filename=''):
     sortedvectors = eigenvectors[:, eigenvalues.argsort()]
 #    sortedvectors = eigenvectors[eigenvalues.argsort()]
 #    np.transpose(sortedvectors)
+    normfactors = []
+    for ii in range (0, len(sortedvectors[0,:])):
+        aa = sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta)
+        aa = aa ** -0.5
+        normfactors.append(aa)
+    sortedvectors = sortedvectors * normfactors
 
     eigenvalues.sort()
     energs = np.transpose(eigenvalues[int(newdata[2, 0])-1:int(newdata[2, 1])])
@@ -45,6 +51,8 @@ def main(filename=''):
     wavefuncts = np.concatenate((wavefuncs_x, wanted_waves), axis=1)
 
     np.savetxt("wavefunctions.dat", wavefuncts)
+
+
 
 #    with open("wavefunctions.dat", "w") as fp:
 #        print(newdata[2, 0], newdata[2, 1])
