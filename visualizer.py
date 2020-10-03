@@ -50,7 +50,7 @@ def data_visualizer():
 
     plt.xlabel("[Bohr]")
     plt.title("sigma x")
-
+    plt.savefig('curves.pdf', format='pdf')
 
 if __name__ == '__main__':
     data_visualizer()
