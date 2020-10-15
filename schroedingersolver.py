@@ -1,11 +1,14 @@
+#!/usr/bin/env python3
 """routines for solving a time independant 1D-Schroedinger-equation"""
 import numpy as np
 import scipy.interpolate as inter
 import os.path
 import numpy.linalg as linalg
+import argparse
 # from scipy.linalg import eigh_tridiagonal
 # import eigh_tridiagonal
 _TOLERANCE = 0.000001
+_DESCRIPTION = 'solver for Schroedinger-equation'
 
 
 def main(directory=''):
@@ -15,9 +18,13 @@ def main(directory=''):
         directory:
             directory of input file other than subdirectory 'input'
     """
+    parser = argparse.ArgumentParser(description=_DESCRIPTION)
+    msg = 'Directory (default: .)'
+    parser.add_argument('-d', '--directory', default='.', help=msg)
+    args = parser.parse_args()
 
-    filename = os.path.join(directory, "schrodinger.inp")
-    newdata = _read_input(filename)
+    file_location = os.path.join(args.directory, "schrodinger.inp")
+    newdata = _read_input(file_location)
     potential, delta, mass = _potential_generator(newdata)
     hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
 #    eigenvalues, eigenvectors = _hamiltonmatrix_solver(potential, mass, delta,
@@ -59,7 +66,7 @@ def main(directory=''):
     print(wavefuncts[0:2000:200, :])
 
 
-def _read_input(filename):
+def _read_input(file_location):
     """reads input file and produces according variables
 
     Args:
@@ -76,9 +83,6 @@ def _read_input(filename):
             -points: matrix with set poits of curve
     """
     alldata = []
-
-    directory = "input"
-    file_location = os.path.join(directory, filename)
     with open(file_location) as fp:
         for line in fp:
             alldata.append(line.strip())
