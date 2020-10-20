@@ -1,15 +1,16 @@
 """Contains tests for schroedingersolver module"""
-
+import pytest
 import schroedingersolver
 import numpy as np
 import os.path
 
+saved_results = ["5.1", "5.2", "5.3", "5.4", "5.5", "5.6"]
 
 
-@pytest.mark.parametrize()
-def test_examples():
-    datalocation = os.path.join("test-data", "5.1")
-    schroedingersolver.main("input/5.1")
+@pytest.mark.parametrize("ntest", saved_results)
+def test_examples(ntest):
+    datalocation = os.path.join("test-data", ntest)
+    schroedingersolver.main("input/" + ntest)
 
     potential = np.loadtxt("potential.dat")
     energies = np.loadtxt("energies.dat")
