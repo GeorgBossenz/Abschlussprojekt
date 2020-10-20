@@ -5,6 +5,31 @@ import numpy as np
 import os.path
 
 
+
+result5.1 = (np.loadtxt("energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+result5.2 = (np.loadtxt("energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+result5.3 = (np.loadtxt("energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+result5.4 = (np.loadtxt("energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+result5.5 = (np.loadtxt("energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+
+testdata5.1 = (np.loadtxt("test-data", "5.1", "energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+testdata5.2 = (np.loadtxt("test-data", "5.2", "energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+testdata5.3 = (np.loadtxt("test-data", "5.3", "energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+testdata5.4 = (np.loadtxt("test-data", "5.4", "energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+testdata5.5 = (np.loadtxt("test-data", "5.5", "energies.dat", "expvalues.dat", "potential.dat", "wavefunctions.dat"))
+
+results = [(result5.1, testdata5.1), (result5.2, testdata5.2), (result5.3, testdata5.3), (result5.4, testdata5.4), (result5.5, testdata5.5)]
+
+@pytest.mark.parametrize("paar", results)
+def test_results(paar):
+    Ergebnis, Testwert = paar
+    assert
+
+
+
+
+
+
 def test_V1():
     datalocation = os.path.join("test-data", "5.1")
     schroedingersolver.main("5.1")

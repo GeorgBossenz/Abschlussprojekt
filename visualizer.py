@@ -3,77 +3,72 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import os.path
 
 _DESCRIPTION = "visualizer for the obtained results from the schroedingersolver"
 
-def main():
-    """visualizer for the obtained results from the schroedingersolver
+
+
+def data_visualizer(directory='', scale=''):
+    """reads and plots data from input
 
     Args:
-        directory:
-            directory of results from schroedingersolver
+    scale: directory, scales the wavefunctions, default = no scaling
     """
 
     parser = argparse.ArgumentParser(description=_DESCRIPTION)
     msg = 'Directory (default: .)'
-    parser.add_argument('-d', '--directory', default='.', help=msg)
+    parser.add_argument('-d', '--directory', default=directory, help=msg)
     msg = 'Scale factor'
-    
+    parser.add_argument('scale', type=float, help=msg)
     args = parser.parse_args()
 
-    def data_visualizer(args.directory, scale=1):
-        """reads and plots data from input
+    plt.subplot(1, 2, 1)
 
-        Args:
-            scale: directory, scales the wavefunctions, default = no scaling
-        """
+    potential = (np.loadtxt(os.path.join(args.directory, "potential.dat")))
+    xx = potential[:, 0]
+    y1 = potential[:, 1]
 
-        plt.subplot(1, 2, 1)
+    aa = (np.loadtxt(os.path.join(args.directory, "wavefunctions.dat")))
+    bb = (np.loadtxt(os.path.join(args.directory, "energies.dat")))
+    cc = (np.loadtxt(os.path.join(args.directory, "expvalues.dat")))
 
-        potential = np.loadtxt(args.directory, "potential.dat")
-        xx = potential[:, 0]
-        y1 = potential[:, 1]
+    plotnr = 0
+    for wert in bb:
+        eigenwert = []
+        for xwert in potential:
+            eigenwert.append(wert)
+        plt.plot(xx, eigenwert, color="grey")
 
-        aa = np.loadtxt(args.directory, "wavefunctions.dat")
-        bb = np.loadtxt(args.directory, "energies.dat")
-        cc = np.loadtxt(args.directory, "expvalues.dat")
+        if plotnr % 2:
+            color = "red"
+        else:
+            color = "blue"
+        plt.plot(xx, aa[:, plotnr + 1] * args.scale + wert, color=color)
+        plt.plot(cc[plotnr, 0], wert, marker="x", color="green", mew=2)
+        plotnr += 1
+    plt.plot(xx, y1, color="black", scaley=False)
 
-        plotnr = 0
-        for wert in bb:
-            eigenwert = []
-            for xwert in potential:
-                eigenwert.append(wert)
-                plt.plot(xx, eigenwert, color="grey")
+    plt.xlabel("x [Bohr]")
+    plt.ylabel("Energy [Hartree]")
+    plt.title("Potential, eigenstates, <x>")
 
-            if plotnr % 2:
-                color = "red"
-            else:
-                color = "blue"
-                plt.plot(xx, aa[:, plotnr + 1] * scale + wert, color=color)
-                plt.plot(cc[plotnr, 0], wert, marker="x", color="green", mew=2)
-                plotnr += 1
-                plt.plot(xx, y1, color="black", scaley=False)
+    plt.subplot(1, 2, 2)
 
-        plt.xlabel("x [Bohr]")
-        plt.ylabel("Energy [Hartree]")
-        plt.title("Potential, eigenstates, <x>")
+    plotnr = 0
+    for wert in bb:
+        eigenwert = []
+        for xwert in potential:
+            eigenwert.append(wert)
+        plt.plot(xx, eigenwert, color="grey")
+        plt.plot(cc[plotnr, 1], wert, marker="+", color="violet",
+                 markersize=12, mew=2)
+        plotnr += 1
 
-        plt.subplot(1, 2, 2)
-
-        plotnr = 0
-        for wert in bb:
-            eigenwert = []
-            for xwert in potential:
-                eigenwert.append(wert)
-                plt.plot(xx, eigenwert, color="grey")
-                plt.plot(cc[plotnr, 1], wert, marker="+", color="violet",
-                         markersize=12, mew=2)
-                plotnr += 1
-
-        plt.xlabel("[Bohr]")
-        plt.title("sigma x")
-        plt.savefig('curves.pdf', format='pdf')
+    plt.xlabel("[Bohr]")
+    plt.title("sigma x")
+    plt.savefig('curves.pdf', format='pdf')
 
 
 if __name__ == '__main__':
-    main()
+    data_visualizer()
