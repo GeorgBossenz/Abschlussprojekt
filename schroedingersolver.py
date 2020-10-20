@@ -141,7 +141,7 @@ def _potential_generator(newdata):
         if newdata[3, 0] == 1:
             coeffs = np.polyfit(x_data, y_data, yy - 6)
         else:
-            V_x = inter.CubicSpline(x_data, y_data)
+            V_x = inter.CubicSpline(x_data, y_data, bc_type='natural')
     else:
         V_x = inter.interp1d(x_data, y_data, kind='linear')
 
