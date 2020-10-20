@@ -25,9 +25,9 @@ def main(directory='.'):
 
     file_location = os.path.join(args.directory, "schrodinger.inp")
     newdata = IO.read_input(file_location)
-    potential, delta, mass = _potential_generator(newdata)
-    hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
-    eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian)
+    potential, delta, mass = potential_generator(newdata)
+    hamiltonian = hamiltonmatrix_generator(potential, delta, mass)
+    eigenvalues, eigenvectors = hamiltonmatrix_solver(hamiltonian)
 
     sortedvectors = eigenvectors[:, eigenvalues.argsort()]
 
@@ -46,7 +46,7 @@ def main(directory='.'):
     wavefuncs_x.shape = (len(potential), 1)
     wavefuncts = np.concatenate((wavefuncs_x, wanted_waves), axis=1)
 
-    expected_x, sigma = _expvalues_calculator(wanted_waves, delta, potential)
+    expected_x, sigma = expvalues_calculator(wanted_waves, delta, potential)
 
     xyz, nvalues = np.shape(wanted_waves)
     expvalues = np.zeros((nvalues, 2))
@@ -55,7 +55,7 @@ def main(directory='.'):
     IO.save_results(expvalues, energs, wavefuncts, potential)
 
 
-def _potential_generator(newdata):
+def potential_generator(newdata):
     """generates points of potential curve
 
     Args:
@@ -113,7 +113,7 @@ def _potential_generator(newdata):
     return potential, delta, mass
 
 
-def _hamiltonmatrix_generator(potential, delta, mass):
+def hamiltonmatrix_generator(potential, delta, mass):
     """generates the hamilton matrix
 
     Args:
@@ -141,7 +141,7 @@ def _hamiltonmatrix_generator(potential, delta, mass):
     return hamiltonian
 
 
-def _hamiltonmatrix_solver(hamiltonian):
+def hamiltonmatrix_solver(hamiltonian):
     """procedure to produce eigenvalues and corresponding eigenvectors
     of hamilton matrix
 
@@ -158,7 +158,7 @@ def _hamiltonmatrix_solver(hamiltonian):
     return eigenvalues, eigenvectors
 
 
-def _expvalues_calculator(wanted_waves, delta, potential):
+def expvalues_calculator(wanted_waves, delta, potential):
     """will calculate sigma and uncertainty
 
     Args:

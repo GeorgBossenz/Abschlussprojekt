@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 import argparse
 import os.path
 
-_DESCRIPTION = "visualizer for the obtained results from the schroedingersolver"
-
+_DESCRIPTION = """
+visualizer for the obtained results from the schroedingersolver
+"""
 
 
 def data_visualizer(directory='', scale=''):
@@ -20,7 +21,7 @@ def data_visualizer(directory='', scale=''):
     msg = 'Directory (default: .)'
     parser.add_argument('-d', '--directory', default=directory, help=msg)
     msg = 'Scale factor'
-    parser.add_argument('scale', type=float, help=msg)
+    parser.add_argument('scale', default=scale, type=float, help=msg)
     args = parser.parse_args()
 
     plt.subplot(1, 2, 1)
