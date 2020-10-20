@@ -5,10 +5,9 @@ import scipy.interpolate as inter
 import os.path
 import numpy.linalg as linalg
 import argparse
-# from scipy.linalg import eigh_tridiagonal
-# import eigh_tridiagonal
+
 _TOLERANCE = 0.000001
-_DESCRIPTION = 'solver for Schroedinger-equation'
+_DESCRIPTION = 'solver for schroedinger-equation'
 
 
 def main(directory='.'):
@@ -27,17 +26,12 @@ def main(directory='.'):
     newdata = _read_input(file_location)
     potential, delta, mass = _potential_generator(newdata)
     hamiltonian = _hamiltonmatrix_generator(potential, delta, mass)
-#    eigenvalues, eigenvectors = _hamiltonmatrix_solver(potential, mass, delta,
-# newdata)
     eigenvalues, eigenvectors = _hamiltonmatrix_solver(hamiltonian)
 
-#    np.transpose(eigenvectors)
     sortedvectors = eigenvectors[:, eigenvalues.argsort()]
-#    sortedvectors = eigenvectors[eigenvalues.argsort()]
-#    np.transpose(sortedvectors)
+
     normfactors = []
     for ii in range(0, len(sortedvectors[0, :])):
-        # np.sum hat hier nicht funktionieren wollen
         aa = sum(sortedvectors[:, ii] * sortedvectors[:, ii] * delta)
         aa = aa ** -0.5
         normfactors.append(aa)
@@ -63,8 +57,6 @@ def main(directory='.'):
     np.savetxt("wavefunctions.dat", wavefuncts)
     np.savetxt("potential.dat", potential)
 
-    print(wavefuncts[0:2000:200, :])
-
 
 def _read_input(file_location):
     """reads input file and produces according variables
@@ -89,13 +81,11 @@ def _read_input(file_location):
     dataline_y = 0
     for dataline in alldata:
         alldata[dataline_y] = dataline.split("#")[0].strip().split()
-# removes annotation of input data and splits lines into lists of
-# individual inputs
         dataline_y += 1
 
     if alldata[3] == ['linear']:
         alldata[3] = [0]
-    elif alldata[3] == ['polinomial']:
+    elif alldata[3] == ['polynomial']:
         alldata[3] = [1]
     elif alldata[3] == ['cspline']:
         alldata[3] = [2]
@@ -135,7 +125,6 @@ def _potential_generator(newdata):
         y_data.append(base[pointcount, 1])
         pointcount += 1
 
-# check if that works with floats
     V_x = False
     if newdata[3, 0]:
         if newdata[3, 0] == 1:
@@ -186,21 +175,20 @@ def _hamiltonmatrix_generator(potential, delta, mass):
     ii, bb = potential.shape
     aa = 1 / (mass * (delta**2))
 
-    hamiltonian = np.zeros((ii,ii))
-    hamiltonian[0,0] = potential[0,1] + aa
-    hamiltonian[0,1] = -0.5 *aa
-    hamiltonian[ii-1,ii-1] = potential[ii-1,1] + aa
-    hamiltonian[ii-1,ii-2] = -0.5 *aa
+    hamiltonian = np.zeros((ii, ii))
+    hamiltonian[0, 0] = potential[0, 1] + aa
+    hamiltonian[0, 1] = -0.5 * aa
+    hamiltonian[ii-1, ii-1] = potential[ii-1, 1] + aa
+    hamiltonian[ii-1, ii-2] = -0.5 * aa
 
     for index in range(ii-2):
-        hamiltonian[index+1,index] = -0.5 *aa
-        hamiltonian[index+1,index+1] = potential[index+1,1] + aa
-        hamiltonian[index+1,index+2] = -0.5 *aa
+        hamiltonian[index+1, index] = -0.5 * aa
+        hamiltonian[index+1, index+1] = potential[index+1, 1] + aa
+        hamiltonian[index+1, index+2] = -0.5 * aa
     return hamiltonian
 
 
 def _hamiltonmatrix_solver(hamiltonian):
-    # def _hamiltonmatrix_solver(potential, mass, delta, newdata):
     """procedure to produce eigenvalues and corresponding eigenvectors
     of hamilton matrix
 
@@ -211,15 +199,8 @@ def _hamiltonmatrix_solver(hamiltonian):
         eigenvalues: list of aquired eigevalues
         eingenvectors: list of eigenvectors
     """
-#    from scipy.sparse.linalg import eigsh
-#    eigenvalues, eigenvectors = eigsh(hamiltonian, newdata[2, 1], which='SM')
 
     eigenvalues, eigenvectors = linalg.eig(hamiltonian)
-
-#    aa = 1 / (mass * (delta**2))
-#    eigenvalues, eigenvectors = eigh_tridiagonal(aa * potential[:, 1],
-#          np.ones(len(potential)-1) * -0.5 * aa, select='i',
-#          select_range=(newdata[2, 0], newdata[2, 1]), tol=_TOLERANCE)
 
     return eigenvalues, eigenvectors
 
@@ -243,9 +224,6 @@ def _expvalues_calculator(wanted_waves, delta, potential):
     mean_x = np.sum(wavesquared * potential_x[:, np.newaxis], axis=0) * delta
     sigma = (mean_x - (expected_x ** 2)) ** 0.5
     return expected_x, sigma
-# output should be file not variable
-
-# def _data_saver(eigenvalues, eigenvectors):
 
 
 if __name__ == '__main__':
