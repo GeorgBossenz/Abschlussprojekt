@@ -11,7 +11,7 @@ _TOLERANCE = 0.000001
 _DESCRIPTION = 'solver for Schroedinger-equation'
 
 
-def main(directory=''):
+def main(directory='.'):
     """solver for Schroedinger-equation
 
     Args:
@@ -20,7 +20,7 @@ def main(directory=''):
     """
     parser = argparse.ArgumentParser(description=_DESCRIPTION)
     msg = 'Directory (default: .)'
-    parser.add_argument('-d', '--directory', default='.', help=msg)
+    parser.add_argument('-d', '--directory', default=directory, help=msg)
     args = parser.parse_args()
 
     file_location = os.path.join(args.directory, "schrodinger.inp")
@@ -196,6 +196,7 @@ def _hamiltonmatrix_generator(potential, delta, mass):
         hamiltonian[index+1,index] = -0.5 *aa
         hamiltonian[index+1,index+1] = potential[index+1,1] + aa
         hamiltonian[index+1,index+2] = -0.5 *aa
+    return hamiltonian
 
 
 def _hamiltonmatrix_solver(hamiltonian):
