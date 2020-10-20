@@ -5,3 +5,7 @@ test_schrödinger-solver.py
 __pycache__
 docs
 .cache
+energies.dat
+expvalues.dat
+potential.dat
+wavefunctions.dat
